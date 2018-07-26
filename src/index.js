@@ -1,10 +1,10 @@
+import sample from 'lodash/sample';
+import shuffle from 'lodash/shuffle';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
 import AuthorQuiz from './AuthorQuiz';
+import './index.css';
 import registerServiceWorker from './registerServiceWorker';
-import shuffle from 'lodash/shuffle';
-import sample from 'lodash/sample';
 
 const authors = [
   {
@@ -30,25 +30,36 @@ const authors = [
     imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/0/0c/Mark_Twain_by_AF_Bradley.jpg',
     imageSource: 'Wikimedia',
     books: ['Test A', 'Soy un Libro', 'Test C', 'Test D']
-  },
+  }
 ];
 
-function getTurnData(authors){
+function getTurnData(authors) {
   const books = authors.reduce((previous, current) => {
     return previous.concat(current.books);
   }, []);
-  const random = shuffle(books).slice(0,4);
+  const random = shuffle(books).slice(0, 4);
   const answer = sample(random);
 
   return {
     books: random,
-    author: authors.find(author => author.books.some(title => title === answer)),
-  }
+    author: authors.find(author => author.books.some(title => title === answer))
+  };
+}
+
+function onAnswerSelected(answer) {
+  const isCorrect = state.turnData.author.books.some(book => book === answer);
+  state.hightlight = isCorrect ? 'correct' : 'wrong';
+  masterRender();
 }
 
 const state = {
   turnData: getTurnData(authors),
+  hightlight: 'wrong'
 };
 
-ReactDOM.render(<AuthorQuiz {...state} />, document.getElementById('root'));
+function masterRender(){
+  ReactDOM.render(<AuthorQuiz {...state} onAnswerSelected={onAnswerSelected}/>, document.getElementById('root'));
+}
+
+masterRender();
 registerServiceWorker();
