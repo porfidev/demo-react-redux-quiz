@@ -1,6 +1,7 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import PropTypes from 'prop-types';
 import React from 'react';
+import { Link } from 'react-router-dom';
 import './App.css';
 
 function Hero() {
@@ -55,9 +56,11 @@ Turn.propTypes = {
   onAnswerSelected: PropTypes.func.isRequired
 };
 
-function Continue() {
+function Continue({ show, onContinue}) {
   return (
-    <div></div>
+    <div>
+      {show ? <button onClick={onContinue}>Continuar</button> : null}
+    </div>
   );
 }
 
@@ -71,12 +74,13 @@ function Footer() {
   );
 }
 
-function AuthorQuiz({turnData, hightlight, onAnswerSelected}) {
+function AuthorQuiz({turnData, hightlight, onAnswerSelected, onContinue}) {
   return (
     <div className="container">
       <Hero/>
       <Turn {...turnData} hightlight={hightlight} onAnswerSelected={onAnswerSelected}/>
-      <Continue/>
+      <Continue show={hightlight === 'correct'} onContinue={onContinue}/>
+      <p><Link to={'/add'}>Agregar Author</Link></p>
       <Footer/>
     </div>
   );

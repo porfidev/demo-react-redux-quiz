@@ -2,6 +2,8 @@ import sample from 'lodash/sample';
 import shuffle from 'lodash/shuffle';
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { BrowserRouter, Route, withRouter } from 'react-router-dom';
+import AddAuthorForm from './AddAuthorForm';
 import AuthorQuiz from './AuthorQuiz';
 import './index.css';
 import registerServiceWorker from './registerServiceWorker';
@@ -52,13 +54,37 @@ function onAnswerSelected(answer) {
   masterRender();
 }
 
-const state = {
-  turnData: getTurnData(authors),
-  hightlight: 'wrong'
-};
+function resetState() {
+  return {
+    turnData: getTurnData(authors),
+    hightlight: 'wrong'
+  };
+}
 
-function masterRender(){
-  ReactDOM.render(<AuthorQuiz {...state} onAnswerSelected={onAnswerSelected}/>, document.getElementById('root'));
+let state = resetState();
+
+function App() {
+  return <AuthorQuiz {...state} onAnswerSelected={onAnswerSelected}
+                     onContinue={() => {
+                       state = resetState();
+                       masterRender();
+                     }}/>;
+}
+
+const AddAuthorFromWrapper = withRouter(({history}) => {
+  return <AddAuthorForm onAddAuthor={(author) => {
+    authors.push(author);
+    history.push('/');
+  }}/>;
+});
+
+function masterRender() {
+  ReactDOM.render(<BrowserRouter>
+    <React.Fragment>
+      <Route exact path={'/'} component={App}/>
+      <Route path={'/add'} component={AddAuthorFromWrapper}/>
+    </React.Fragment>
+  </BrowserRouter>, document.getElementById('root'));
 }
 
 masterRender();
