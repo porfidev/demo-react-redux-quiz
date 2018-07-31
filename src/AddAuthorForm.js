@@ -1,5 +1,9 @@
 import * as PropTypes from 'prop-types';
 import React, { Component } from 'react';
+import { withRouter } from 'react-router-dom';
+
+// REDUX
+import {connect} from 'react-redux';
 
 class AddAuthorForm extends Component {
   constructor(props) {
@@ -66,4 +70,17 @@ class AddAuthorForm extends Component {
 
 AddAuthorForm.propTypes = {match: PropTypes.any, onAddAuthor: PropTypes.func};
 
-export default AddAuthorForm;
+function mapDispatchToProps(dispatch, props){
+  return {
+    onAddAuthor: (author) => {
+      dispatch({type: 'ADD_AUTHOR', author});
+      props.history.push('/');
+    }
+  }
+}
+
+function mapStateToProps(state){
+  return state;
+}
+
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(AddAuthorForm));

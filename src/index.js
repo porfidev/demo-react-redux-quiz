@@ -2,7 +2,9 @@ import sample from 'lodash/sample';
 import shuffle from 'lodash/shuffle';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { BrowserRouter, Route, withRouter } from 'react-router-dom';
+import * as ReactRedux from 'react-redux';
+import { BrowserRouter, Route } from 'react-router-dom';
+import * as Redux from 'redux';
 import AddAuthorForm from './AddAuthorForm';
 import AuthorQuiz from './AuthorQuiz';
 import './index.css';
@@ -35,6 +37,27 @@ const authors = [
   }
 ];
 
+// Redux 02
+function reducer(state = {authors, turnData: getTurnData(authors), highlight: ''}, action) {
+  switch (action.type) {
+    case 'ANSWER_SELECTED':
+      const isCorrect = state.turnData.author.books.some(book => book === action.answer);
+      state.highlight = isCorrect ? 'correct' : 'wrong';
+      return Object.assign({}, state, {highlight: isCorrect ? 'correct' : 'wrong'});
+    case 'CONTINUE':
+      return Object.assign({}, state, {highlight: '', turnData: getTurnData(state.authors)});
+    case 'ADD_AUTHOR':
+      return Object.assign({}, state, {
+        authors: state.authors.concat([action.author])
+      });
+    default:
+      return state;
+  }
+}
+
+// Redux 01
+let store = Redux.createStore(reducer);
+
 function getTurnData(authors) {
   const books = authors.reduce((previous, current) => {
     return previous.concat(current.books);
@@ -48,44 +71,14 @@ function getTurnData(authors) {
   };
 }
 
-function onAnswerSelected(answer) {
-  const isCorrect = state.turnData.author.books.some(book => book === answer);
-  state.hightlight = isCorrect ? 'correct' : 'wrong';
-  masterRender();
-}
-
-function resetState() {
-  return {
-    turnData: getTurnData(authors),
-    hightlight: 'wrong'
-  };
-}
-
-let state = resetState();
-
-function App() {
-  return <AuthorQuiz {...state} onAnswerSelected={onAnswerSelected}
-                     onContinue={() => {
-                       state = resetState();
-                       masterRender();
-                     }}/>;
-}
-
-const AddAuthorFromWrapper = withRouter(({history}) => {
-  return <AddAuthorForm onAddAuthor={(author) => {
-    authors.push(author);
-    history.push('/');
-  }}/>;
-});
-
-function masterRender() {
-  ReactDOM.render(<BrowserRouter>
-    <React.Fragment>
-      <Route exact path={'/'} component={App}/>
-      <Route path={'/add'} component={AddAuthorFromWrapper}/>
-    </React.Fragment>
+ReactDOM.render(
+  <BrowserRouter>
+    <ReactRedux.Provider store={store}>
+      <React.Fragment>
+        <Route exact path={'/'} component={AuthorQuiz}/>
+        <Route path={'/add'} component={AddAuthorForm}/>
+      </React.Fragment>
+    </ReactRedux.Provider>
   </BrowserRouter>, document.getElementById('root'));
-}
 
-masterRender();
 registerServiceWorker();

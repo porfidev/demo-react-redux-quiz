@@ -17,7 +17,7 @@ const state = {
       books: ['TestbookA', 'TestbookB', 'TestboolC']
     }
   },
-  hightlight: 'none'
+  highlight: 'none'
 };
 
 describe('Author Quiz', () => {
@@ -41,7 +41,7 @@ describe('Author Quiz', () => {
   describe('When the wrong answer has been selected', () => {
     let wrapper;
     beforeAll(() => {
-      wrapper = mount(<AuthorQuiz {...(Object.assign({}, state, {hightlight: 'wrong'}))} onAnswerSelected={() => {}}/>);
+      wrapper = mount(<AuthorQuiz {...(Object.assign({}, state, {highlight: 'wrong'}))} onAnswerSelected={() => {}}/>);
     });
 
     it('Should have red color', () => {
@@ -52,7 +52,7 @@ describe('Author Quiz', () => {
   describe('When the correct answer has been selected', () => {
     let wrapper;
     beforeAll(() => {
-      wrapper = mount(<AuthorQuiz {...(Object.assign({}, state, {hightlight: 'correct'}))}
+      wrapper = mount(<AuthorQuiz {...(Object.assign({}, state, {highlight: 'correct'}))}
                                   onAnswerSelected={() => {}}/>);
     });
 

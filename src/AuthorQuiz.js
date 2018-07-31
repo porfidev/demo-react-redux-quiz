@@ -1,6 +1,8 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import PropTypes from 'prop-types';
 import React from 'react';
+// Redux
+import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import './App.css';
 
@@ -23,17 +25,17 @@ function Book({title, onClickEvent}) {
   );
 }
 
-function Turn({author, books, hightlight, onAnswerSelected}) {
-  const highlightToColoder = (hightlightSelected) => {
+function Turn({author, books, highlight, onAnswerSelected}) {
+  const highlightToColoder = (highlightSelected) => {
     const map = {
       none: '',
       correct: 'green',
       wrong: 'red'
     };
-    return map[hightlightSelected];
+    return map[highlightSelected];
   };
   return (
-    <div className={'row turn'} style={{backgroundColor: highlightToColoder(hightlight)}}>
+    <div className={'row turn'} style={{backgroundColor: highlightToColoder(highlight)}}>
       <div className={'col-4 offset-1'}>
         <img src={author.imageUrl} className={'authorimage'} alt={'Author'}/>
       </div>
@@ -52,11 +54,11 @@ Turn.propTypes = {
     books: PropTypes.arrayOf(PropTypes.string).isRequired
   }),
   books: PropTypes.arrayOf(PropTypes.string).isRequired,
-  hightlight: PropTypes.string.isRequired,
+  highlight: PropTypes.string.isRequired,
   onAnswerSelected: PropTypes.func.isRequired
 };
 
-function Continue({ show, onContinue}) {
+function Continue({show, onContinue}) {
   return (
     <div>
       {show ? <button onClick={onContinue}>Continuar</button> : null}
@@ -74,17 +76,41 @@ function Footer() {
   );
 }
 
-function AuthorQuiz({turnData, hightlight, onAnswerSelected, onContinue}) {
+const main = function (all) {
+  const {turnData, highlight, onAnswerSelected, onContinue} = all;
   return (
     <div className="container">
       <Hero/>
-      <Turn {...turnData} hightlight={hightlight} onAnswerSelected={onAnswerSelected}/>
-      <Continue show={hightlight === 'correct'} onContinue={onContinue}/>
+      <Turn {...turnData} highlight={highlight} onAnswerSelected={onAnswerSelected}/>
+      <Continue show={highlight === 'correct'} onContinue={onContinue}/>
       <p><Link to={'/add'}>Agregar Author</Link></p>
       <Footer/>
     </div>
   );
 
+};
+
+// Redux 05
+function mapStateToProps(state) {
+  return {
+    turnData: state.turnData,
+    highlight: state.highlight
+  };
 }
+
+// Redux 06
+function mapDispatchToProps(dispatch) {
+  return {
+    onAnswerSelected: (answer) => {
+      dispatch({type: 'ANSWER_SELECTED', answer});
+    },
+    onContinue: () => {
+      dispatch({type: 'CONTINUE'});
+    }
+  };
+}
+
+// Redux 04
+const AuthorQuiz = connect(mapStateToProps, mapDispatchToProps)(main);
 
 export default AuthorQuiz;
